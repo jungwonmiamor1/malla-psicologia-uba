@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Malla Curricular - Psicología UBA</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #f4f6f8;
+      margin: 0;
+      padding: 20px;
+    }
+    h1 {
+      text-align: center;
+      color: #333;
+    }
+    .section {
+      margin: 40px 0;
+    }
+    .grid {
+      display: flex;
+      gap: 20px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    .column, .row {
+      background: #fff;
+      border-radius: 12px;
+      padding: 15px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      min-width: 220px;
+    }
+    .row {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      margin-top: 30px;
+    }
+    .materia {
+      background: #e0e7ef;
+      margin: 8px 0;
+      padding: 8px 12px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .materia.aprobada {
+      background: #a5d6a7;
+      text-decoration: line-through;
+    }
+    .materia.bloqueada {
+      background: #ddd;
+      color: #888;
+      cursor: not-allowed;
+    }
+  </style>
+</head>
+<body>
+  <h1>Malla Curricular - Psicología UBA</h1>
+
+  <div class="section" id="cbc">
+    <h2>📘 CBC</h2>
+    <div class="grid">
+      <div class="column">
+        <div class="materia" data-id="ipc">Introducción al Pensamiento Científico</div>
+        <div class="materia" data-id="icse">Introducción al Conocimiento de la Sociedad y el Estado</div>
+        <div class="materia" data-id="psico">Psicología</div>
+        <div class="materia" data-id="semio">Semiótica</div>
+        <div class="materia" data-id="bio">Biología</div>
+        <div class="materia" data-id="mate">Matemáticas</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section" id="formacion-general">
+    <h2>📗 Ciclo de Formación General</h2>
+    <div class="grid">
+      <div class="column">
+        <div class="materia" data-id="freud" data-correlativas="cbc">Psicoanálisis: Freud</div>
+        <div class="materia" data-id="estadistica" data-correlativas="cbc">Estadística</div>
+        <div class="materia" data-id="social" data-correlativas="cbc">Psicología Social</div>
+        <div class="materia" data-id="epistemologia" data-correlativas="cbc">Psicología y Epistemología Genética</div>
+        <div class="materia" data-id="neuro" data-correlativas="cbc">Neurofisiología</div>
+        <div class="materia" data-id="general" data-correlativas="cbc">Psicología General</div>
+      </div>
+      <div class="column">
+        <div class="materia" data-id="historia" data-correlativas="general">Historia de la Psicología</div>
+        <div class="materia" data-id="metodo" data-correlativas="estadistica,general">Metodología de la Investigación</div>
+        <div class="materia" data-id="salud" data-correlativas="metodo,social">Salud Pública y Salud Mental</div>
+        <div class="materia" data-id="grupos" data-correlativas="freud,social">Teoría y Técnicas de Grupos</div>
+        <div class="materia" data-id="ninez" data-correlativas="freud,epistemologia">Psicología Evolutiva: Niñez</div>
+        <div class="materia" data-id="adole" data-correlativas="ninez">Psicología Evolutiva: Adolescencia</div>
+      </div>
+      <div class="column">
+        <div class="materia" data-id="psicopato" data-correlativas="ninez,adole">Psicopatología</div>
+        <div class="materia" data-id="diag1">Teoría y Técnica de Exploración y Diagnóstico I</div>
+        <div class="materia" data-id="mod1">Diagnóstico Psicológico: Módulo I</div>
+        <div class="materia" data-id="mod2" data-correlativas="mod1">Diagnóstico Psicológico: Módulo II</div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="column">
+        <div class="materia" data-id="comportamiento">Biología del Comportamiento</div>
+        <div class="materia" data-id="idioma">Requisito Idioma</div>
+        <div class="materia" data-id="freud2" data-correlativas="freud">Psicoanálisis: Escuela Francesa</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const materias = document.querySelectorAll('.materia');
+    const estado = JSON.parse(localStorage.getItem('materiasAprobadas') || '{}');
+
+    function guardarEstado() {
+      localStorage.setItem('materiasAprobadas', JSON.stringify(estado));
+    }
+
+    function actualizarEstado() {
+      materias.forEach(m => {
+        const id = m.dataset.id;
+        const requisitos = m.dataset.correlativas ? m.dataset.correlativas.split(',') : [];
+        const aprobada = estado[id];
+
+        m.classList.remove('aprobada', 'bloqueada');
+
+        if (requisitos.length > 0 && !requisitos.every(req => estado[req])) {
+          m.classList.add('bloqueada');
+        } else {
+          if (aprobada) m.classList.add('aprobada');
+        }
+      });
+    }
+
+    materias.forEach(m => {
+      m.addEventListener('click', () => {
+        const id = m.dataset.id;
+        if (m.classList.contains('bloqueada')) return;
+        estado[id] = !estado[id];
+        guardarEstado();
+        actualizarEstado();
+      });
+    });
+
+    actualizarEstado();
+  </script>
+</body>
+</html>
